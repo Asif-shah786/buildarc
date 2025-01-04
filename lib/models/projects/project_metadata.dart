@@ -19,17 +19,13 @@ class ProjectMetadata {
   factory ProjectMetadata.fromJson(Map<String, dynamic> json) => _$ProjectMetadataFromJson(json);
   Map<String, dynamic> toJson() => _$ProjectMetadataToJson(this);
 
-
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is ProjectMetadata &&
-        other.id == id &&
-        other.name == name;
+    return other is ProjectMetadata && other.id == id && other.name == name;
   }
 
   @override
   int get hashCode => id.hashCode ^ name.hashCode;
-
 }

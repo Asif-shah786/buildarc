@@ -3,11 +3,14 @@ import 'package:ardennes/libraries/account_context/state.dart';
 import 'package:ardennes/libraries/core_ui/image_downloading/image_firebase.dart';
 import 'package:ardennes/models/drawings/drawing_item.dart';
 import 'package:ardennes/models/drawings/drawings_catalog_data.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../models/drawings/drawing_sheet_view_log.dart';
+import '../recent_drawing/recent_drawing_bloc.dart';
 import 'drawings_catalog_bloc.dart';
 import 'drawings_catalog_event.dart';
 import 'drawings_catalog_state.dart';
@@ -57,24 +60,16 @@ class DrawingsCatalogScreenState extends State<DrawingsCatalogScreen> {
                         selectedDiscipline: state.uiState.selectedDiscipline,
                         selectedTag: state.uiState.selectedTag,
                         onVersionSelected: (version) {
-                          context
-                              .read<DrawingsCatalogBloc>()
-                              .add(UpdateSelectedVersionEvent(version));
+                          context.read<DrawingsCatalogBloc>().add(UpdateSelectedVersionEvent(version));
                         },
                         onCollectionSelected: (collection) {
-                          context
-                              .read<DrawingsCatalogBloc>()
-                              .add(UpdateSelectedCollectionEvent(collection));
+                          context.read<DrawingsCatalogBloc>().add(UpdateSelectedCollectionEvent(collection));
                         },
                         onDisciplineSelected: (discipline) {
-                          context
-                              .read<DrawingsCatalogBloc>()
-                              .add(UpdateSelectedDisciplineEvent(discipline));
+                          context.read<DrawingsCatalogBloc>().add(UpdateSelectedDisciplineEvent(discipline));
                         },
                         onTagSelected: (tag) {
-                          context
-                              .read<DrawingsCatalogBloc>()
-                              .add(UpdateSelectedTagEvent(tag));
+                          context.read<DrawingsCatalogBloc>().add(UpdateSelectedTagEvent(tag));
                         },
                       ),
                       const SizedBox(height: 16),
@@ -115,6 +110,16 @@ class DrawingGrid extends StatelessWidget {
       children: drawingItems.map((drawing) {
         return GestureDetector(
           onTap: () {
+            if ((FirebaseAuth.instance.currentUser?.uid ?? '').isNotEmpty && projectId.isNotEmpty) {
+              DrawingViewLogItem newItem = DrawingViewLogItem(
+                title: drawing.title,
+                subTitle: drawing.collection,
+                url: drawing.smallThumbnailUrl,
+              );
+              context.read<RecentDrawingBloc>().add(LogRecentDrawing(
+                  projectId: projectId, userId: FirebaseAuth.instance.currentUser!.uid, newItem: newItem));
+            }
+
             context.go(
               Uri(
                 path: '/drawings/sheet/',
@@ -130,8 +135,7 @@ class DrawingGrid extends StatelessWidget {
           child: Card(
             child: Column(
               children: [
-                Expanded(
-                    child: ImageFromFirebase(imageUrl: drawing.thumbnailUrl)),
+                Expanded(child: ImageFromFirebase(imageUrl: drawing.thumbnailUrl)),
                 Text(drawing.title),
               ],
             ),
@@ -322,8 +326,7 @@ class DropdownButtonWidgetState<T> extends State<DropdownButtonWidget<T>> {
           _selectItem(null);
         },
         deleteIcon: const Icon(Icons.cancel),
-        avatar:
-            Icon(Icons.check, color: Theme.of(context).colorScheme.secondary),
+        avatar: Icon(Icons.check, color: Theme.of(context).colorScheme.secondary),
         onPressed: () => _showDropdown(context),
       );
     }
