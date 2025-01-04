@@ -4,9 +4,10 @@ import '../../../models/drawings/drawing_sheet_view_log.dart';
 
 @Injectable()
 class RecentDrawingService {
-  RecentDrawingService();
+  RecentDrawingService({FirebaseFirestore? firestore}) : firestore = firestore ?? FirebaseFirestore.instance;
 
-  final firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore firestore;
+
   Stream<List<DrawingSheetViewLog>> getRecentDrawings({required String projectId, required String userId}) {
     final query = firestore
         .collection('home_screens')

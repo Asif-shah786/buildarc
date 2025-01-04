@@ -22,6 +22,7 @@ import 'package:ardennes/libraries/drawing/image_provider.dart' as _i836;
 import 'package:ardennes/libraries/drawing/recent_drawing_service.dart'
     as _i1048;
 import 'package:ardennes/models/projects/project_metadata.dart' as _i455;
+import 'package:cloud_firestore/cloud_firestore.dart' as _i974;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 
@@ -37,14 +38,14 @@ extension GetItInjectableX on _i174.GetIt {
       environmentFilter,
     );
     final registerModule = _$RegisterModule();
-    gh.factory<_i1048.RecentDrawingService>(
-        () => _i1048.RecentDrawingService());
     gh.factory<_i836.UIImageProvider>(() => _i836.UIImageProvider());
     gh.factory<_i608.DrawingsCatalogBloc>(
         () => registerModule.drawingsCatalogBloc);
     gh.factory<_i934.AccountContextBloc>(
         () => registerModule.accountContextBloc);
     gh.factory<_i984.RecentDrawingBloc>(() => registerModule.recentDrawingBloc);
+    gh.factory<_i1048.RecentDrawingService>(() =>
+        _i1048.RecentDrawingService(firestore: gh<_i974.FirebaseFirestore>()));
     gh.factoryParam<_i573.DrawingCatalogService, _i455.ProjectMetadata?,
         dynamic>((
       savedSelectedProject,
