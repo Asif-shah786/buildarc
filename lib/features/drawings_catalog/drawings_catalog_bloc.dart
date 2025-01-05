@@ -18,6 +18,7 @@ class DrawingsCatalogBloc extends Bloc<DrawingsCatalogEvent, DrawingsCatalogStat
     on<UpdateSelectedDisciplineEvent>(_updateSelectedDiscipline);
     on<UpdateSelectedTagEvent>(_updateSelectedTag);
     on<UpdateSelectedVersionEvent>(_updateSelectedVersion);
+    on<SearchDrawingsCatalogEvent>(_searchDrawingsCatalog);
   }
 
   void _init(InitEvent event, Emitter<DrawingsCatalogState> emit) async {
@@ -42,6 +43,17 @@ class DrawingsCatalogBloc extends Bloc<DrawingsCatalogEvent, DrawingsCatalogStat
   void _updateSelectedTag(UpdateSelectedTagEvent event, Emitter<DrawingsCatalogState> emit) {
     savedUiState.selectedTag = event.selectedTag;
     _updateSelected(emit);
+  }
+
+  void _searchDrawingsCatalog(SearchDrawingsCatalogEvent event, Emitter<DrawingsCatalogState> emit) {
+    final state = this.state;
+    if (state is FetchedDrawingsCatalogState) {
+      final filteredItems = state.drawingsCatalog.drawingItems.where((item) {
+        return item.title.toLowerCase().contains(event.searchQuery.toLowerCase());
+      }).toList();
+      emit(FetchedDrawingsCatalogState(
+          drawingsCatalog: state.drawingsCatalog, displayedItems: filteredItems, uiState: savedUiState));
+    }
   }
 
   void _updateSelected(Emitter<DrawingsCatalogState> emit) {

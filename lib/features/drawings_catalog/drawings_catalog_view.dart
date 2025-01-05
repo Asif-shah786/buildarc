@@ -23,6 +23,19 @@ class DrawingsCatalogScreen extends StatefulWidget {
 }
 
 class DrawingsCatalogScreenState extends State<DrawingsCatalogScreen> {
+  final searchController = TextEditingController();
+
+  @override
+  void initState() {
+    searchController.addListener(
+      () {
+        final searchQuery = searchController.text;
+        context.read<DrawingsCatalogBloc>().add(SearchDrawingsCatalogEvent(searchQuery));
+      },
+    );
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final accountContextState = context.watch<AccountContextBloc>().state;
@@ -39,11 +52,12 @@ class DrawingsCatalogScreenState extends State<DrawingsCatalogScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const TextField(
+          TextField(
             decoration: InputDecoration(
               hintText: 'Search',
               prefixIcon: Icon(Icons.search),
             ),
+            controller: searchController,
           ),
           const SizedBox(height: 16),
           Expanded(

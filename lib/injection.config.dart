@@ -44,6 +44,8 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i934.AccountContextBloc>(
         () => registerModule.accountContextBloc);
     gh.factory<_i984.RecentDrawingBloc>(() => registerModule.recentDrawingBloc);
+    gh.lazySingleton<_i974.FirebaseFirestore>(
+        () => registerModule.firebaseFirestore);
     gh.factory<_i1048.RecentDrawingService>(() =>
         _i1048.RecentDrawingService(firestore: gh<_i974.FirebaseFirestore>()));
     gh.factoryParam<_i573.DrawingCatalogService, _i455.ProjectMetadata?,
