@@ -27,17 +27,16 @@ class HomeScreenData {
       drawings: data?['drawings'] is Iterable
           ? List.from(data?['drawings'])
               .map((drawingMap) => RecentlyViewedDrawingTile(
-                    title: drawingMap['title'],
-                    subtitle: drawingMap['subtitle'],
-                    drawingThumbnailUrl: drawingMap['drawingThumbnailUrl'],
+                    title: drawingMap['title'] ?? '',
+                    subtitle: drawingMap['subtitle'] ?? '',
+                    drawingThumbnailUrl: drawingMap['drawingThumbnailUrl'] ?? '',
                   ))
               .toList()
           : null,
     );
   }
 
-  static Map<String, Object?> toFirestore(
-      Object? homeScreenData, SetOptions? options) {
+  static Map<String, Object?> toFirestore(Object? homeScreenData, SetOptions? options) {
     if (homeScreenData is HomeScreenData) {
       return {
         if (homeScreenData.drawings != null)
@@ -50,8 +49,7 @@ class HomeScreenData {
               .toList(),
       };
     } else {
-      throw ArgumentError(
-          "homeScreenData is not an instance of HomeScreenData");
+      throw ArgumentError("homeScreenData is not an instance of HomeScreenData");
     }
   }
 }

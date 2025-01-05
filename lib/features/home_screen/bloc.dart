@@ -20,12 +20,11 @@ class HomeScreenBloc extends Bloc<HomeScreenEvent, HomeScreenState> {
     emit(state.clone());
   }
 
-  void _fetchHomeScreenContent(
-      FetchHomeScreenContentEvent event, Emitter<HomeScreenState> emit) async {
+  void _fetchHomeScreenContent(FetchHomeScreenContentEvent event, Emitter<HomeScreenState> emit) async {
     User? currentUser = FirebaseAuth.instance.currentUser;
-    if (_currentSelectedProject == event.selectedProject) {
-      return;
-    }
+    // if (_currentSelectedProject == event.selectedProject) {
+    //   return;
+    // }
     if (currentUser == null) {
       return emit(HomeScreenFetchErrorState("User doesn't exist"));
     }
@@ -44,8 +43,7 @@ class HomeScreenBloc extends Bloc<HomeScreenEvent, HomeScreenState> {
       QuerySnapshot<HomeScreenData> querySnapshot = await homeScreenQuery.get();
       HomeScreenData? homeScreenData = querySnapshot.docs.firstOrNull?.data();
       if (homeScreenData != null) {
-        emit(FetchedHomeScreenContentState(
-            recentlyViewedDrawingTiles: homeScreenData.drawings ?? []));
+        emit(FetchedHomeScreenContentState(recentlyViewedDrawingTiles: homeScreenData.drawings ?? []));
       } else {
         // TODO: Handle the project doesn't have a homescreen setup
         emit(HomeScreenFetchErrorState("Project id doesn't exist"));

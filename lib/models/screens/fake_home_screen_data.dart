@@ -12,14 +12,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 void populateHomeScreens() {
   final users = FirebaseFirestore.instance.collection("home_screens");
-  for (final homeScreen in [
-    fakeRecentlyViewedDrawingsOfProject1,
-    fakeRecentlyViewedDrawingsOfProject2
-  ]) {
-    users
-        .doc(
-            "project_${homeScreen["project_id"]}_user_${homeScreen["user_id"]}")
-        .set(homeScreen);
+  for (final homeScreen in [fakeRecentlyViewedDrawingsOfProject1, fakeRecentlyViewedDrawingsOfProject2]) {
+    users.doc("project_${homeScreen["project_id"]}_user_${homeScreen["user_id"]}").set(homeScreen);
   }
 }
 
@@ -35,9 +29,8 @@ final fakeRecentlyViewedDrawingsOfProject1 = <String, dynamic>{
       3,
       (index) => {
             "title": "A10$index",
-            "subtitle": "FACTORY FLOOR PLAN",
-            "drawingThumbnailUrl":
-                "drawing_images/$_companyId/$_project1Id/recently_viewed_drawings_${index + 1}.jpg"
+            "subtitle": "FACTORY FLOOR P",
+            "drawingThumbnailUrl": "drawing_images/$_companyId/$_project1Id/recently_viewed_drawings_${index + 1}.jpg"
           }),
 };
 
@@ -49,7 +42,6 @@ final fakeRecentlyViewedDrawingsOfProject2 = <String, dynamic>{
       (index) => {
             "title": "A10${index + 3}",
             "subtitle": "OFFICE FLOOR PLAN",
-            "drawingThumbnailUrl":
-                "drawing_images/$_companyId/$_project2Id/recently_viewed_drawings_${index + 4}.jpg"
+            "drawingThumbnailUrl": "drawing_images/$_companyId/$_project2Id/recently_viewed_drawings_${index + 4}.jpg"
           }),
 };

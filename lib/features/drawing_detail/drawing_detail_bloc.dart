@@ -11,16 +11,15 @@ import 'drawing_detail_state.dart';
 @injectable
 class DrawingDetailBloc extends Bloc<DrawingDetailEvent, DrawingDetailState> {
   final UIImageProvider uiImageProvider;
+
   String? currentDrawingDocumentId;
 
-  DrawingDetailBloc({required this.uiImageProvider})
-      : super(DrawingDetailState().init()) {
+  DrawingDetailBloc({required this.uiImageProvider}) : super(DrawingDetailState().init()) {
     on<LoadSheet>(_loadSheet);
     on<AddAnnotation>(_addAnnotation);
     on<DeleteAnnotation>(_deleteAnnotation);
     on<UpdateAnnotation>(_updateAnnotation);
   }
-
   void _loadSheet(LoadSheet event, Emitter<DrawingDetailState> emit) async {
     emit(DrawingDetailStateLoading());
 
@@ -59,8 +58,7 @@ class DrawingDetailBloc extends Bloc<DrawingDetailEvent, DrawingDetailState> {
           await emit.forEach(
             annotationsQuery.snapshots(),
             onData: (annotationsSnapshot) {
-              final List<Sketch> annotations =
-                  annotationsSnapshot.docs.map((doc) => doc.data()).toList();
+              final List<Sketch> annotations = annotationsSnapshot.docs.map((doc) => doc.data()).toList();
 
               annotations.sort((a, b) => a.updateTime.compareTo(b.updateTime));
               return DrawingDetailStateLoaded(
@@ -79,8 +77,7 @@ class DrawingDetailBloc extends Bloc<DrawingDetailEvent, DrawingDetailState> {
     }
   }
 
-  void _addAnnotation(
-      AddAnnotation event, Emitter<DrawingDetailState> emit) async {
+  void _addAnnotation(AddAnnotation event, Emitter<DrawingDetailState> emit) async {
     final annotation = event.annotation;
     final annotationMap = Sketch.toFirestoreOptimized(annotation, null);
 
@@ -96,8 +93,7 @@ class DrawingDetailBloc extends Bloc<DrawingDetailEvent, DrawingDetailState> {
     }
   }
 
-  void _deleteAnnotation(
-      DeleteAnnotation event, Emitter<DrawingDetailState> emit) async {
+  void _deleteAnnotation(DeleteAnnotation event, Emitter<DrawingDetailState> emit) async {
     final documentId = currentDrawingDocumentId;
     if (documentId == null) {
       emit(DrawingDetailStateError(errorMessage: 'No drawing found'));
@@ -111,8 +107,7 @@ class DrawingDetailBloc extends Bloc<DrawingDetailEvent, DrawingDetailState> {
     }
   }
 
-  void _updateAnnotation(
-      UpdateAnnotation event, Emitter<DrawingDetailState> emit) async {
+  void _updateAnnotation(UpdateAnnotation event, Emitter<DrawingDetailState> emit) async {
     final annotation = event.annotation;
     final annotationMap = Sketch.toFirestoreOptimized(annotation, null);
 
@@ -128,5 +123,4 @@ class DrawingDetailBloc extends Bloc<DrawingDetailEvent, DrawingDetailState> {
           .update(annotationMap);
     }
   }
-
 }

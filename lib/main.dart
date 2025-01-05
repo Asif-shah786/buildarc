@@ -2,10 +2,10 @@ import 'package:ardennes/auth_screen.dart';
 import 'package:ardennes/features/drawing_detail/drawing_detail_bloc.dart';
 import 'package:ardennes/features/drawing_detail/drawing_detail_view.dart';
 import 'package:ardennes/features/drawings_catalog/drawings_catalog_bloc.dart';
-import 'package:ardennes/features/drawings_catalog/drawings_catalog_event.dart'
-    as dc_event;
+import 'package:ardennes/features/drawings_catalog/drawings_catalog_event.dart' as dc_event;
 import 'package:ardennes/features/drawings_catalog/drawings_catalog_view.dart';
 import 'package:ardennes/features/home_screen/view.dart';
+import 'package:ardennes/features/recent_drawing/recent_drawing_bloc.dart';
 import 'package:ardennes/injection.dart';
 import 'package:ardennes/libraries/account_context/bloc.dart';
 import 'package:ardennes/libraries/account_context/event.dart' as ac_event;
@@ -106,12 +106,13 @@ final _router = GoRouter(
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
         return MultiBlocProvider(providers: [
+          BlocProvider<RecentDrawingBloc>(create: (BuildContext context) => getIt<RecentDrawingBloc>()),
+          BlocProvider<DrawingDetailBloc>(create: (BuildContext context) => getIt<DrawingDetailBloc>()),
           BlocProvider<DrawingsCatalogBloc>(create: (BuildContext context) {
             return getIt<DrawingsCatalogBloc>()..add(dc_event.InitEvent());
           }),
           BlocProvider<AccountContextBloc>(
-              create: (BuildContext context) =>
-                  getIt<AccountContextBloc>()..add(ac_event.InitEvent()))
+              create: (BuildContext context) => getIt<AccountContextBloc>()..add(ac_event.InitEvent())),
         ], child: MainScreen(navigationShell: navigationShell));
       },
       branches: [
@@ -127,50 +128,34 @@ final _router = GoRouter(
         StatefulShellBranch(
           navigatorKey: _drawingCatalogNavigatorKey,
           routes: [
-            GoRoute(
-                path: '/drawings',
-                builder: (context, state) => const DrawingsCatalogScreen(),
-                routes: [
-                  GoRoute(
-                    path: 'sheet',
-                    parentNavigatorKey: _rootNavigatorKey,
-                    builder: (context, state) {
-                      final number = state.uri.queryParameters['number'] ?? '';
-                      final collection =
-                          state.uri.queryParameters['collection'] ?? '';
-                      final projectId =
-                          state.uri.queryParameters['projectId'] ?? '';
-                      final versionId = int.tryParse(
-                              state.uri.queryParameters['versionId'] ?? '') ??
-                          0;
-                      return MultiBlocProvider(
-                          providers: [
-                            BlocProvider<DrawingsCatalogBloc>(
-                                create: (BuildContext context) {
-                              return getIt<DrawingsCatalogBloc>();
-                            }),
-                            BlocProvider<AccountContextBloc>(
-                                create: (BuildContext context) =>
-                                    getIt<AccountContextBloc>()
-                                      ..add(ac_event.InitEvent())),
-                            BlocProvider<DrawingDetailBloc>(
-                              create: (BuildContext context) =>
-                                  getIt<DrawingDetailBloc>()
-                                    ..add(dd_event.LoadSheet(
-                                        number: number,
-                                        collection: collection,
-                                        versionId: versionId,
-                                        projectId: projectId)),
-                            )
-                          ],
-                          child: DrawingDetailScreen(
-                              number: number,
-                              collection: collection,
-                              projectId: projectId,
-                              versionId: versionId));
-                    },
-                  ),
-                ]),
+            GoRoute(path: '/drawings', builder: (context, state) => const DrawingsCatalogScreen(), routes: [
+              GoRoute(
+                path: 'sheet',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (context, state) {
+                  final number = state.uri.queryParameters['number'] ?? '';
+                  final collection = state.uri.queryParameters['collection'] ?? '';
+                  final projectId = state.uri.queryParameters['projectId'] ?? '';
+                  final versionId = int.tryParse(state.uri.queryParameters['versionId'] ?? '') ?? 0;
+                  return MultiBlocProvider(
+                      providers: [
+                        BlocProvider<RecentDrawingBloc>(create: (BuildContext context) => getIt<RecentDrawingBloc>()),
+                        BlocProvider<DrawingsCatalogBloc>(create: (BuildContext context) {
+                          return getIt<DrawingsCatalogBloc>();
+                        }),
+                        BlocProvider<AccountContextBloc>(
+                            create: (BuildContext context) => getIt<AccountContextBloc>()..add(ac_event.InitEvent())),
+                        BlocProvider<DrawingDetailBloc>(
+                          create: (BuildContext context) => getIt<DrawingDetailBloc>()
+                            ..add(dd_event.LoadSheet(
+                                number: number, collection: collection, versionId: versionId, projectId: projectId)),
+                        )
+                      ],
+                      child: DrawingDetailScreen(
+                          number: number, collection: collection, projectId: projectId, versionId: versionId));
+                },
+              ),
+            ]),
           ],
         ),
       ],

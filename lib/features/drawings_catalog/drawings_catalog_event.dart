@@ -29,3 +29,8 @@ class UpdateSelectedTagEvent extends DrawingsCatalogEvent {
   final DrawingTag? selectedTag;
   UpdateSelectedTagEvent(this.selectedTag);
 }
+
+class SearchDrawingsCatalogEvent extends DrawingsCatalogEvent {
+  final String searchQuery;
+  SearchDrawingsCatalogEvent(this.searchQuery);
+}
