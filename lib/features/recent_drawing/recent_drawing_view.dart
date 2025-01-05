@@ -1,11 +1,30 @@
 import 'package:ardennes/features/recent_drawing/recent_drawing_bloc.dart';
 import 'package:ardennes/libraries/core_ui/image_downloading/image_firebase.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../libraries/account_context/bloc.dart';
+import '../../libraries/account_context/state.dart';
+
 class RecentDrawingView extends StatelessWidget {
   const RecentDrawingView({super.key});
+
+  void loadRecentDrawings(BuildContext context) {
+    final state = context.watch<AccountContextBloc>().state;
+    if (state is AccountContextLoadedState && state.selectedProject != null) {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid != null) {
+        context.read<RecentDrawingBloc>().add(
+              LoadRecentDrawings(
+                projectId: state.selectedProject!.id!,
+                userId: uid,
+              ),
+            );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +67,19 @@ class RecentDrawingView extends StatelessWidget {
                       separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 16.0),
                     );
                   } else if (state is RecentDrawingError) {
-                    return Text(state.message);
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(state.message),
+                        ElevatedButton(
+                            onPressed: () {
+                              loadRecentDrawings(context);
+                            },
+                            child: Text('Try again')),
+                      ],
+                    );
                   }
                   return Container();
                 },

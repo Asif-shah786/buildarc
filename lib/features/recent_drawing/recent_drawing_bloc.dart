@@ -20,7 +20,6 @@ class RecentDrawingBloc extends Bloc<RecentDrawingEvent, RecentDrawingState> {
     emit(RecentDrawingLoading());
 
     try {
-      // Await the stream processing completely
       final subscription = service
           .getRecentDrawings(
         projectId: event.projectId,
@@ -35,8 +34,6 @@ class RecentDrawingBloc extends Bloc<RecentDrawingEvent, RecentDrawingState> {
       }, onError: (error) {
         emit(RecentDrawingError('Failed to load recent drawings.'));
       });
-
-      // Ensure subscription completes
       await subscription.asFuture();
     } catch (e) {
       emit(RecentDrawingError('Failed to load recent drawings.'));
